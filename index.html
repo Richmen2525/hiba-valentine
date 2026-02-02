@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,17 +26,12 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     position: relative;
     max-width: 90%;
+    z-index: 2;
   }
 
-  h1 {
-    margin-bottom: 30px;
-    color: #ff4d6d;
-  }
+  h1 { margin-bottom: 30px; color: #ff4d6d; }
 
-  .buttons {
-    position: relative;
-    height: 150px;
-  }
+  .buttons { position: relative; height: 150px; }
 
   button {
     padding: 12px 25px;
@@ -47,17 +43,8 @@
     transition: 0.2s ease;
   }
 
-  #yesBtn {
-    background-color: #ff4d6d;
-    color: white;
-    left: 20%;
-  }
-
-  #noBtn {
-    background-color: #aaa;
-    color: white;
-    left: 60%;
-  }
+  #yesBtn { background-color: #ff4d6d; color: white; left: 20%; }
+  #noBtn  { background-color: #aaa; color: white; left: 60%; }
 
   .message {
     font-size: 22px;
@@ -65,9 +52,37 @@
     margin-top: 20px;
     display: none;
   }
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 🎬 Video Popup */
+  .video-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3;
+  }
+
+  .video-popup video {
+    width: 90%;
+    max-width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.6);
+  }
 </style>
 </head>
 <body>
+
+<canvas id="fireworks"></canvas>
 
 <div class="card">
   <h1 id="question">Hiba madam, will you be my Valentine? 💖</h1>
@@ -78,7 +93,11 @@
   <div class="message" id="loveMsg">YAYYY!! I knew it 😍💞</div>
 </div>
 
-<!-- Background Music -->
+<!-- 🎬 Hidden Video Popup -->
+<div class="video-popup" id="videoPopup">
+  <video id="loveVideo" src="love.mp4" controls autoplay></video>
+</div>
+
 <audio id="bgMusic" loop>
   <source src="song.mp3" type="audio/mpeg">
 </audio>
@@ -89,6 +108,8 @@
   const message = document.getElementById("loveMsg");
   const question = document.getElementById("question");
   const music = document.getElementById("bgMusic");
+  const popup = document.getElementById("videoPopup");
+  const video = document.getElementById("loveVideo");
 
   const questions = [
     "Are you sure Hiba madam? 🥺",
@@ -106,27 +127,64 @@
     const y = Math.random() * (window.innerHeight - 60);
     noBtn.style.left = x + "px";
     noBtn.style.top = y + "px";
-
-    // Change question each time
-    question.textContent = questions[questionIndex % questions.length];
-    questionIndex++;
+    question.textContent = questions[questionIndex++ % questions.length];
   }
 
   noBtn.addEventListener("mouseover", moveButton);
-  noBtn.addEventListener("touchstart", function(e) {
-    e.preventDefault();
-    moveButton();
-  });
+  noBtn.addEventListener("touchstart", e => { e.preventDefault(); moveButton(); });
 
   yesBtn.addEventListener("click", () => {
     message.style.display = "block";
     question.textContent = "Best decision ever, Hiba madam 💞";
-
-    // Play music after user interaction (browser rule)
     music.play();
+    startFireworks();
+
+    // Show video popup
+    popup.style.display = "flex";
+    video.play();
   });
+
+  // Close video when clicked outside
+  popup.addEventListener("click", () => {
+    popup.style.display = "none";
+    video.pause();
+  });
+
+  // 🎆 Fireworks
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let particles = [];
+
+  function createFirework() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height / 2;
+    for (let i = 0; i < 80; i++) {
+      particles.push({ x, y, angle: Math.random()*2*Math.PI, speed: Math.random()*5+2, life: 100 });
+    }
+  }
+
+  function updateFireworks() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, i) => {
+      p.x += Math.cos(p.angle) * p.speed;
+      p.y += Math.sin(p.angle) * p.speed;
+      p.life--;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+      ctx.fillStyle = "hsl(" + Math.random()*360 + ",100%,60%)";
+      ctx.fill();
+      if (p.life <= 0) particles.splice(i, 1);
+    });
+    requestAnimationFrame(updateFireworks);
+  }
+
+  function startFireworks() {
+    setInterval(createFirework, 700);
+    updateFireworks();
+  }
 </script>
 
 </body>
 </html>
-
