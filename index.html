@@ -175,4 +175,13 @@ function updateFireworks(){
     requestAnimationFrame(updateFireworks);
 }
 
-func
+function startFireworks(){
+    const interval = setInterval(()=>{
+        if(stopFireworks) clearInterval(interval);
+        createFirework();
+    },700);
+    updateFireworks();
+}
+</script>
+</body>
+</html>
