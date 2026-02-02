@@ -43,18 +43,13 @@ button {
     margin-top:20px;
     display:none;
 }
-canvas {
-    position:fixed; top:0; left:0;
-    pointer-events:none;
-    z-index:1;
-}
-.video-popup {
+.gif-popup {
     position:fixed; inset:0;
     background:black; display:none;
     justify-content:center; align-items:center;
     z-index:5;
 }
-.video-popup video {
+.gif-popup img {
     width:95%;
     max-width:500px;
     border-radius:15px;
@@ -62,8 +57,6 @@ canvas {
 </style>
 </head>
 <body>
-
-<canvas id="fireworks"></canvas>
 
 <div class="card">
   <h1 id="question">Hiba madam, will you be my Valentine? 💖</h1>
@@ -74,11 +67,12 @@ canvas {
   <div class="message" id="loveMsg">I knew you'd say YES 😍💞</div>
 </div>
 
-<div class="video-popup" id="videoPopup">
-  <video id="loveVideo" src="love.mp4" controls autoplay></video>
+<!-- GIF popup -->
+<div class="gif-popup" id="gifPopup">
+  <img id="loveGif" src="love.gif" alt="Love GIF">
 </div>
 
-<audio id="bgMusic" loop>
+<audio id="bgMusic" loop autoplay>
     <source src="song.mp3" type="audio/mpeg">
 </audio>
 
@@ -88,8 +82,7 @@ const yesBtn = document.getElementById("yesBtn");
 const question = document.getElementById("question");
 const message = document.getElementById("loveMsg");
 const music = document.getElementById("bgMusic");
-const popup = document.getElementById("videoPopup");
-const video = document.getElementById("loveVideo");
+const gifPopup = document.getElementById("gifPopup");
 
 const questions = [
   "Are you sure Hiba madam? 🥺",
@@ -101,12 +94,9 @@ const questions = [
 ];
 let qIndex = 0;
 
-// START MUSIC ON FIRST USER INTERACTION
-document.body.addEventListener("click", () => {
-  if (music.paused) music.play();
-}, {once:true});
+// Move NO continuously until YES clicked
+let noInterval = setInterval(moveNoBtn, 1000); // every 1 second
 
-// Move NO when hovering or clicking
 function moveNoBtn() {
     const x = Math.random()*(window.innerWidth-120);
     const y = Math.random()*(window.innerHeight-60);
@@ -114,6 +104,8 @@ function moveNoBtn() {
     noBtn.style.top = y+"px";
     question.textContent = questions[qIndex++ % questions.length];
 }
+
+// Make NO also move on hover or click for fun
 noBtn.addEventListener("mouseover", moveNoBtn);
 noBtn.addEventListener("click", moveNoBtn);
 noBtn.addEventListener("touchstart", e=>{e.preventDefault(); moveNoBtn();});
@@ -122,66 +114,23 @@ noBtn.addEventListener("touchstart", e=>{e.preventDefault(); moveNoBtn();});
 yesBtn.addEventListener("click", () => {
     message.style.display="block";
     question.textContent = "Best decision ever, Hiba madam 💞";
-    
+
     // STOP background music
     music.pause();
     music.currentTime = 0;
 
-    startFireworks();
+    // Stop NO button movement
+    clearInterval(noInterval);
 
-    // AFTER 5 SECONDS, SHOW VIDEO
-    setTimeout(()=>{
-        stopFireworks = true;
-        popup.style.display="flex";
-        video.play();
-    },5000);
+    // Show GIF immediately
+    gifPopup.style.display="flex";
 });
 
-// CLOSE VIDEO ON CLICK
-popup.addEventListener("click", ()=>{
-    popup.style.display="none";
-    video.pause();
+// Close GIF on click
+gifPopup.addEventListener("click", ()=>{
+    gifPopup.style.display="none";
 });
-
-// FIREWORKS
-const canvas = document.getElementById("fireworks");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-let particles = [];
-let stopFireworks = false;
-
-function createFirework(){
-    const x=Math.random()*canvas.width;
-    const y=Math.random()*canvas.height/2;
-    for(let i=0;i<80;i++){
-        particles.push({x,y,angle:Math.random()*2*Math.PI,speed:Math.random()*5+2,life:100});
-    }
-}
-
-function updateFireworks(){
-    if(stopFireworks) return;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach((p,i)=>{
-        p.x += Math.cos(p.angle)*p.speed;
-        p.y += Math.sin(p.angle)*p.speed;
-        p.life--;
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,2,0,Math.PI*2);
-        ctx.fillStyle = "hsl("+Math.random()*360+",100%,60%)";
-        ctx.fill();
-        if(p.life<=0) particles.splice(i,1);
-    });
-    requestAnimationFrame(updateFireworks);
-}
-
-function startFireworks(){
-    const interval = setInterval(()=>{
-        if(stopFireworks) clearInterval(interval);
-        createFirework();
-    },700);
-    updateFireworks();
-}
 </script>
 </body>
 </html>
+
