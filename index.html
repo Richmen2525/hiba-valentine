@@ -1,1 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>For Hiba Madam 💖</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  .card {
+    text-align: center;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+    max-width: 90%;
+  }
+
+  h1 {
+    margin-bottom: 30px;
+    color: #ff4d6d;
+  }
+
+  .buttons {
+    position: relative;
+    height: 150px;
+  }
+
+  button {
+    padding: 12px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    position: absolute;
+    transition: 0.2s ease;
+  }
+
+  #yesBtn {
+    background-color: #ff4d6d;
+    color: white;
+    left: 20%;
+  }
+
+  #noBtn {
+    background-color: #aaa;
+    color: white;
+    left: 60%;
+  }
+
+  .message {
+    font-size: 22px;
+    color: #ff4d6d;
+    margin-top: 20px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1 id="question">Hiba madam, will you be my Valentine? 💖</h1>
+  <div class="buttons">
+    <button id="yesBtn">Yes 💘</button>
+    <button id="noBtn">No 🙈</button>
+  </div>
+  <div class="message" id="loveMsg">YAYYY!! I knew it 😍💞</div>
+</div>
+
+<!-- Background Music -->
+<audio id="bgMusic" loop>
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const message = document.getElementById("loveMsg");
+  const question = document.getElementById("question");
+  const music = document.getElementById("bgMusic");
+
+  const questions = [
+    "Are you sure Hiba madam? 🥺",
+    "Think again… I’ll be sad 💔",
+    "Last chance! Don’t break my heart 😭",
+    "You really wanna say no? 😢",
+    "Okay but I’ll keep asking 😌",
+    "Hiba madam… please? 💖"
+  ];
+
+  let questionIndex = 0;
+
+  function moveButton() {
+    const x = Math.random() * (window.innerWidth - 120);
+    const y = Math.random() * (window.innerHeight - 60);
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+
+    // Change question each time
+    question.textContent = questions[questionIndex % questions.length];
+    questionIndex++;
+  }
+
+  noBtn.addEventListener("mouseover", moveButton);
+  noBtn.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    moveButton();
+  });
+
+  yesBtn.addEventListener("click", () => {
+    message.style.display = "block";
+    question.textContent = "Best decision ever, Hiba madam 💞";
+
+    // Play music after user interaction (browser rule)
+    music.play();
+  });
+</script>
+
+</body>
+</html>
 
